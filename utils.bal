@@ -23,13 +23,10 @@ public isolated function generateAccessToken(User user) returns string|error {
         audience: jwt_audience,
         expTime: iat + <decimal>jwt_expiresIn,
         signatureConfig: {
-            algorithm: jwt:HS256,
-            config: {
-                keyFile: jwt_secret
-            }
+            algorithm: jwt:HS256
         },
         customClaims: {
-            "sub": user._id ?: "",
+            "sub": user.id,
             "email": user.email,
             "roles": user.roles
         }
@@ -48,13 +45,10 @@ public isolated function generateRefreshToken(User user) returns string|error {
         audience: jwt_audience,
         expTime: iat + <decimal>jwt_refreshExpiresIn,
         signatureConfig: {
-            algorithm: jwt:HS256,
-            config: {
-                keyFile: jwt_secret
-            }
+            algorithm: jwt:HS256
         },
         customClaims: {
-            "sub": user._id ?: "",
+            "sub": user.id,
             "type": "refresh"
         }
     };
@@ -102,7 +96,7 @@ public isolated function generatePasswordResetToken() returns string {
 
 public isolated function toPublicUser(User user) returns UserPublic {
     return {
-        id: user._id ?: "",
+        id: user.id,
         username: user.username,
         email: user.email,
         roles: user.roles,

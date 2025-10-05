@@ -1,6 +1,6 @@
 import ballerina/time;
 public type User record {|
-    string _id?;
+    string id;
     string username;
     string email;
     string passwordHash;

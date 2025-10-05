@@ -1,9 +1,9 @@
 import ballerina/http;
 import ballerina/log;
 import ballerina/time;
-import factorquest_backend.database;
+import ballerina/uuid;
 
-service /auth on new http:Listener(api_port) {
+service /auth on new http:Listener(server_port +1) {
     resource function post register(RegisterRequest req) returns AuthResponse|http:BadRequest|http:Conflict|http:InternalServerError {
         if req.username.length() < 3 {
             return <http:BadRequest>{
@@ -29,7 +29,7 @@ service /auth on new http:Listener(api_port) {
             };
         }
 
-        User|error existingEmail = database:findUserByEmail(req.email);
+        User|error existingEmail = findUserByEmail(req.email);
         if existingEmail is User {
             return <http:Conflict>{
                 body: {
@@ -50,6 +50,7 @@ service /auth on new http:Listener(api_port) {
 
         time:Utc now = time:utcNow();
         User newUser = {
+            id: uuid:createType1AsString(),
             username: req.username,
             email: req.email,
             passwordHash: passwordHash,
@@ -60,7 +61,7 @@ service /auth on new http:Listener(api_port) {
             roles: ["player"]
         };
 
-        User|error savedUser = database:createUser(newUser);
+        User|error savedUser = createUser(newUser);
         if savedUser is error {
             log:printError("Erreur lors de la création de l'utilisateur", 'error = savedUser);
             return <http:InternalServerError>{
@@ -90,7 +91,7 @@ service /auth on new http:Listener(api_port) {
     }
 
     resource function post login(LoginRequest req) returns AuthResponse|http:Unauthorized|http:InternalServerError {
-        User|error user = database:findUserByUsername(req.username);
+        User|error user = findUserByUsername(req.username);
         if user is error {
             return <http:Unauthorized>{
                 body: {
@@ -145,7 +146,7 @@ service /auth on new http:Listener(api_port) {
             };
         }
 
-        User|error user = database:findUserById(payload.sub);
+        User|error user = findUserById(payload.sub);
         if user is error {
             return <http:Unauthorized>{
                 body: {
@@ -192,7 +193,7 @@ service /auth on new http:Listener(api_port) {
             };
         }
 
-        User|error user = database:findUserById(payload.sub);
+        User|error user = findUserById(payload.sub);
         if user is error {
             return <http:Unauthorized>{
                 body: {
@@ -213,7 +214,7 @@ service /auth on new http:Listener(api_port) {
             };
         }
 
-        User|error user = database:findUserByEmail(req.email);
+        User|error user = findUserByEmail(req.email);
         if user is error {
             return <http:Ok>{
                 body: {
@@ -226,13 +227,13 @@ service /auth on new http:Listener(api_port) {
         time:Utc expiresAt = time:utcAddSeconds(time:utcNow(), 3600);
 
         PasswordResetToken token = {
-            userId: user._id ?: "",
+            userId: user.id,
             token: resetToken,
             expiresAt: expiresAt,
             used: false
         };
 
-        error? result = database:createPasswordResetToken(token);
+        error? result = createPasswordResetToken(token);
         if result is error {
             log:printError("Erreur lors de la création du token de réinitialisation");
             return <http:InternalServerError>{
@@ -261,7 +262,7 @@ service /auth on new http:Listener(api_port) {
             };
         }
 
-        PasswordResetToken|error token = database:findPasswordResetToken(req.token);
+        PasswordResetToken|error token = findPasswordResetToken(req.token);
         if token is error {
             return <http:BadRequest>{
                 body: {
@@ -289,7 +290,7 @@ service /auth on new http:Listener(api_port) {
         }
 
         token.used = true;
-        error? result = database:updatePasswordResetToken(token);
+        error? result = updatePasswordResetToken(token._id ?: "", token);
         if result is error {
             log:printError("Erreur lors de la mise à jour du token de réinitialisation");
             return <http:InternalServerError>{
@@ -299,7 +300,7 @@ service /auth on new http:Listener(api_port) {
             };
         }
 
-        error? updateResult = database:updateUserPassword(token.userId, passwordHash);
+        error? updateResult = updateUserPassword(token.userId, passwordHash);
         if updateResult is error {
             log:printError("Erreur lors de la mise à jour du mot de passe");
             return <http:InternalServerError>{
@@ -309,7 +310,7 @@ service /auth on new http:Listener(api_port) {
             };
         }
 
-        error? markResult = database:markPasswordResetTokenAsUsed(req.token);
+        error? markResult = markPasswordResetTokenUsed(req.token);
         if markResult is error {
             log:printError("Erreur lors du marquage du token de réinitialisation comme utilisé");
             return <http:InternalServerError>{
