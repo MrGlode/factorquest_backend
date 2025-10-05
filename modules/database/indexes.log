@@ -1,0 +1,111 @@
+import ballerinax/mongodb;
+import ballerina/log;
+
+public isolated function createIndexes() returns error? {
+    check createUserIndexes();
+    check createResetTokenIndexes();
+    log:printInfo("Indexes created successfully.");
+}
+
+isolated function createUserIndexes() returns error? {
+    mongodb:Collection users = check getCollection(USERS);
+
+    mongodb:Index usernameIndex = {
+        'key: {username: 1},
+        options: {unique: true, name: "username_idx"}
+    };
+
+    mongodb:Index emailIndex = {
+        'key: {email: 1},
+        options: {unique: true, name: "email_idx"}
+    };
+
+    mongodb:Index createdAtIndex = {
+        'key: {createdAt: -1},
+        options: {name: "createdAt_idx"}
+    };
+
+    mongodb:Index isActiveIndex = {
+        'key: {isActive: 1},
+        options: {name: "isActive_idx"}
+    };
+
+    string[]|error result = users->createIndexes([usernameIndex, emailIndex, createdAtIndex, isActiveIndex]);
+    if (result is error) {
+        log:printError("Error creating user indexes", result);
+        return error("Failed to create user indexes");
+    }
+
+    log:printInfo("User indexes created");
+}
+
+isolated function createResetTokenIndexes() returns error? {
+    mongodb:Collection tokens = check getCollection(RESET_TOKENS);
+
+    mongodb:Index tokenIndex = {
+        'key: {token: 1},
+        options: {unique: true, name: "token_idx"}
+    };
+
+    mongodb:Index userIdIndex = {
+        'key: {userId: 1},
+        options: {name: "userId_idx"}
+    };
+
+    mongodb:Index cleanupIndex = {
+        'key: {used: 1,expiresAt: 1},
+        options: {name: "cleanup_idx"}
+    };
+
+    mongodb:Index ttlIndex = {
+        'key: {expiresAt: 1},
+        options: {expireAfterSeconds: 0, name: "ttl_idx"}
+    };
+
+    string[]|error result = tokens->createIndexes([tokenIndex, userIdIndex, cleanupIndex, ttlIndex]);
+    if (result is error) {
+        log:printError("Error creating reset token indexes", result);
+        return error("Failed to create reset token indexes");
+    }
+
+    log:printInfo("Reset token indexes created");
+}
+
+public isolated function dropAllIndexes() returns error? {
+    mongodb:Collection users = check getCollection(USERS);
+    mongodb:Collection tokens = check getCollection(RESET_TOKENS);
+
+    error? userDropResult = users->dropIndexes();
+    if (userDropResult is error) {
+        log:printError("Error dropping user indexes", userDropResult);
+        return error("Failed to drop user indexes");
+    }
+
+    error? tokenDropResult = tokens->dropIndexes();
+    if (tokenDropResult is error) {
+        log:printError("Error dropping reset token indexes", tokenDropResult);
+        return error("Failed to drop reset token indexes");
+    }
+
+    log:printInfo("All indexes dropped successfully.");
+}
+
+public isolated function listIndexes() returns error? {
+    mongodb:Collection users = check getCollection(USERS);
+    mongodb:Collection tokens = check getCollection(RESET_TOKENS);
+
+    mongodb:Index[]|error userIndexes = users->listIndexes();
+    if (userIndexes is error) {
+        log:printError("Error listing user indexes", userIndexes);
+        return error("Failed to list user indexes");
+    }
+    log:printInfo("User Indexes: " + userIndexes.toString());
+
+    mongodb:Index[]|error tokenIndexes = tokens->listIndexes();
+    if (tokenIndexes is error) {
+        log:printError("Error listing reset token indexes", tokenIndexes);
+        return error("Failed to list reset token indexes");
+    }
+    log:printInfo("Reset Token Indexes: " + tokenIndexes.toString());
+}
+
