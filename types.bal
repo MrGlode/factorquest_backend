@@ -69,3 +69,53 @@ public type PasswordResetToken record {|
     time:Utc expiresAt;
     boolean used;
 |};
+
+public type PlayerStats record {|
+    decimal totalMoneyEarned;
+    decimal totalMoneySpent;
+    int totalPlayTime;
+    int machinesBought;
+    int resourcesProduced;
+    int resourcesSold;
+    int researchesCompleted;
+    int specialOrdersCompleted;
+    decimal highestMoney;
+    time:Utc firstLoginDate;
+    time:Utc lastLoginDate;
+    int totalLogins;
+|};
+
+public type PlayerProfile record {|
+    string id;
+    string userId;
+    int level;
+    int experience;
+    PlayerStats stats;
+    time:Utc lastSavedAt;
+|};
+
+public type CreatePlayerProfileRequest record {|
+    string userId;
+|};
+
+public type UpdatePlayerStatsRequest record {|
+    decimal? totalMoneyEarned;
+    decimal? totalMoneySpent;
+    int? totalPlayTime;
+    int? machinesBought;
+    int? resourcesProduced;
+    int? resourcesSold;
+    int? researchesCompleted;
+    int? specialOrdersCompleted;
+    decimal? highestMoney;
+|};
+
+public type PlayerProfilePublic record {|
+    string id;
+    string username;
+    string userId;
+    int level;
+    int experience;
+    PlayerStats stats;
+    time:Utc lastSavedAt;
+|};

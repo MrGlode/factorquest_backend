@@ -128,6 +128,16 @@ service /auth on new http:Listener(server_port +1) {
             };
         }
 
+        error? recordLoginResult = recordLogin(user.id);
+        if recordLoginResult is error {
+            log:printError("Erreur lors de l'enregistrement de la connexion", 'error = recordLoginResult);
+            return <http:InternalServerError>{
+                body: {
+                    message: "Erreur interne du serveur."
+                }
+            };
+        }
+
         return {
             accessToken: accessToken,
             refreshToken: refreshToken,
