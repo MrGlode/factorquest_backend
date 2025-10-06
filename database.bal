@@ -99,7 +99,7 @@ public function updatePasswordResetToken(string tokenId, PasswordResetToken upda
     mongodb:Collection tokens = check getCollection(RESET_TOKENS);
     
     map<json> filter = {
-        "_id": tokenId
+        "id": tokenId
     };
     
     mongodb:Update update = {
@@ -225,7 +225,7 @@ public function findUserById(string userId) returns User|error {
     mongodb:Collection users = check getCollection(USERS);
     
     map<json> filter = { 
-        "_id": userId 
+        "id": userId 
     };
 
     User|mongodb:DatabaseError|mongodb:ApplicationError? result = check users->findOne(filter);
@@ -256,7 +256,7 @@ public function updateUserPassword(string userId, string passwordHash) returns e
     mongodb:Collection users = check getCollection(USERS);
 
     map<json> filter = {
-        "_id": userId
+        "id": userId
     };
 
     time:Utc now = time:utcNow();

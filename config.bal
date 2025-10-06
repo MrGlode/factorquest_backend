@@ -17,7 +17,8 @@ configurable string db_host = ?;
 configurable int db_port = ?;
 configurable string db_database = ?;
 
-configurable string jwt_secret = ?;
+configurable string jwt_privateKeyPath = ?;
+configurable string jwt_publicKeyPath = ?;
 configurable string jwt_issuer = ?;
 configurable string jwt_audience = ?;
 configurable int jwt_expiresIn = ?;

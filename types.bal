@@ -48,7 +48,7 @@ public type JwtPayload record {|
     string sub;
     string username;
     string email;
-    string[] roles;
+    json[] roles;
     int iat;
     int exp;
 |};
@@ -63,7 +63,7 @@ public type ResetPasswordRequest record {|
 |};
 
 public type PasswordResetToken record {|
-    string _id?;
+    string id?;
     string userId;
     string token;
     time:Utc expiresAt;

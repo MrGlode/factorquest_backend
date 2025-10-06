@@ -4,7 +4,7 @@ import ballerina/jwt;
 import ballerina/uuid;
 public isolated function hashPassword(string password) returns string|error {
     byte[] passwordBytes = password.toBytes();
-    byte[] hash = check crypto:hashSha256(passwordBytes);
+    byte[] hash = crypto:hashSha256(passwordBytes);
     return hash.toBase16();
 }
 
@@ -23,7 +23,10 @@ public isolated function generateAccessToken(User user) returns string|error {
         audience: jwt_audience,
         expTime: iat + <decimal>jwt_expiresIn,
         signatureConfig: {
-            algorithm: jwt:HS256
+            algorithm: jwt:RS256,
+            config: { 
+                keyFile: jwt_privateKeyPath
+            }
         },
         customClaims: {
             "sub": user.id,
@@ -45,11 +48,16 @@ public isolated function generateRefreshToken(User user) returns string|error {
         audience: jwt_audience,
         expTime: iat + <decimal>jwt_refreshExpiresIn,
         signatureConfig: {
-            algorithm: jwt:HS256
+            algorithm: jwt:RS256,
+            config: { 
+                keyFile: jwt_privateKeyPath
+            }
         },
         customClaims: {
             "sub": user.id,
-            "type": "refresh"
+            "type": "refresh",
+            "roles": user.roles,
+            "email": user.email
         }
     };
 
@@ -61,22 +69,19 @@ public isolated function validateToken(string token) returns JwtPayload|error {
         issuer: jwt_issuer,
         audience: jwt_audience,
         signatureConfig: {
-            certFile: jwt_secret
+           certFile: jwt_publicKeyPath
         }
     };
 
     jwt:Payload payload = check jwt:validate(token, validatorConfig);
-
-    map<json>|error customClaimsResult = payload["customClaims"].ensureType();
-    map<json> customClaims = customClaimsResult is map<json> ? customClaimsResult : {};
-
-    string sub = payload.sub ?: "";
+        
+    // Extraire les valeurs avec gestion des erreurs (tous via accès par index)
+    string sub = payload["sub"] is string ? <string>payload["sub"] : "";
     string username = payload["username"] is string ? <string>payload["username"] : "";
-    string email = customClaims["email"] is string ? <string>customClaims["email"] : "";
-    json rolesJson = customClaims["roles"] ?: [];
-    string[] roles = rolesJson is json[] ? <string[]> rolesJson : [];
-    int iat = payload.iat ?: 0;
-    int exp = payload.exp ?: 0;
+    string email = payload["email"] is string ? <string>payload["email"] : "";
+    json[] roles = <json[]>payload["roles"];
+    int iat = payload["iat"] is int ? <int>payload["iat"] : 0;
+    int exp = payload["exp"] is int ? <int>payload["exp"] : 0;
 
     JwtPayload jwtPayload = {
         sub: sub,

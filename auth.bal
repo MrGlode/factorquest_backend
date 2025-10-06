@@ -290,7 +290,7 @@ service /auth on new http:Listener(server_port +1) {
         }
 
         token.used = true;
-        error? result = updatePasswordResetToken(token._id ?: "", token);
+        error? result = updatePasswordResetToken(token.id ?: "", token);
         if result is error {
             log:printError("Erreur lors de la mise à jour du token de réinitialisation");
             return <http:InternalServerError>{

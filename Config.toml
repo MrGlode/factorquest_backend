@@ -1,0 +1,26 @@
+server_host = "0.0.0.0"
+server_port = 9090
+server_environment = "development"
+
+cors_allowedOrigins = ["http://localhost:4200", "http://localhost:9090"]
+cors_allowedMethods = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
+cors_allowedHeaders = ["Content-Type", "Authorization"]
+cors_allowCredentials = true
+
+security_bcryptRounds = 10
+security_maxLoginAttempts = 5
+security_lockoutDuration = 900
+
+game_startingMoney = 10000
+game_defaultInventorySize = 100
+
+jwt_privateKeyPath = "certs/privkey.pem"
+jwt_publicKeyPath = "certs/cert.pem"
+jwt_issuer = "factoquest-backend"
+jwt_audience = "factoquest-frontend"
+jwt_expiresIn = 86400
+jwt_refreshExpiresIn = 604800
+
+db_host = "localhost"
+db_port = 27017
+db_database = "factoquest"
