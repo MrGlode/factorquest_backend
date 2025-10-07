@@ -82,6 +82,16 @@ service /auth on new http:Listener(server_port +1) {
             };
         }
 
+        PlayerProfile|error playerProfile = createPlayerProfile(savedUser.id);
+        if playerProfile is error {
+            log:printError("Erreur lors de la création du profil joueur", 'error = playerProfile);
+            return <http:InternalServerError>{
+                body: {
+                    message: "Erreur interne du serveur."
+                }
+            };
+        }
+
         return {
             accessToken: accesToken,
             refreshToken: refreshToken,

@@ -1,6 +1,7 @@
 import ballerinax/mongodb;
 import ballerina/log;
 import ballerina/time;
+import ballerina/uuid;
 
 mongodb:Client mongoClient = check initMongoClient();
 
@@ -391,7 +392,7 @@ public function createPlayerProfile(string userId) returns PlayerProfile|error {
     };
 
     PlayerProfile profile = {
-        id: userId,
+        id: uuid:createType1AsString(),
         userId: userId,
         level: 1,
         experience: 0,
