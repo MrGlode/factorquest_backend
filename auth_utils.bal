@@ -2,6 +2,7 @@ import ballerina/crypto;
 import ballerina/time;
 import ballerina/jwt;
 import ballerina/uuid;
+
 public isolated function hashPassword(string password) returns string|error {
     byte[] passwordBytes = password.toBytes();
     byte[] hash = crypto:hashSha256(passwordBytes);

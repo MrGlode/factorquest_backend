@@ -119,3 +119,92 @@ public type PlayerProfilePublic record {|
     PlayerStats stats;
     time:Utc lastSavedAt;
 |};
+
+public type Resource record {|
+    string id;
+    string name;
+    string icon;
+|};
+
+public type MachineType "mine"|"furnace"|"assembler";
+
+public type RecipeIO record {|
+    string resourceId;
+    int quantity;
+|};
+
+public type Recipe record {|
+    string id;
+    string name;
+    RecipeIO[] inputs;
+    RecipeIO[] outputs;
+    decimal duration;
+    MachineType machineType;
+|};
+
+public type GameState record {|
+    string id;
+    string userId;
+    decimal money;
+    time:Utc lastSavedTime;
+    int totalPlayTime;
+|};
+
+public type InventoryItem record {|
+    string resourceId;
+    int quantity;
+|};
+
+public type Inventory record {|
+    string id;
+    string userId;
+    InventoryItem[] items;
+    time:Utc lastUpdated;
+|};
+
+public type Machine record {|
+    string id;
+    string userId;
+    MachineType 'type;
+    string name;
+    decimal cost;
+    string? selectedRecipeId;
+    time:Utc lastProdctionTime;
+    decimal pauseProgress;
+    boolean isActive;
+    time:Utc createdAt;
+|};
+
+public type CreateGameStateRequest record {|
+    string userId;
+    decimal? initialMoney;
+|};
+
+public type UpdateGameStateRequest record {|
+    decimal? money;
+    int? totalPlayTime;
+|};
+
+public type UpdateInveintoryRequest record {|
+    string resourceId;
+    int quantity;
+|};
+
+public type CreateMachineRequest record {|
+    string userId;
+    MachineType 'type;
+    decimal cost;
+|};
+
+public type UpdateMachineRequest record {|
+    time:Utc? lastProdctionTime;
+    string? selectedRecipeId;
+    decimal? pauseProgress;
+    boolean? isActive;
+|};
+
+public type GameStateResponse record {|
+    GameState state;
+    Inventory inventory;
+    Machine[] machines;
+|};
