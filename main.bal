@@ -1,5 +1,6 @@
 import ballerina/http;
 import ballerina/time;
+import ballerina/log;
 
 @http:ServiceConfig {
     cors: {
@@ -29,4 +30,11 @@ service on new http:Listener(server_port) {
             "apiPrefix": "/api/v1"
         };
     }
+}
+
+public function main() returns error? {
+    log:printInfo("FactoQuest Backend service started on port " + server_port.toString());
+    check initializeDefaultRecipes();
+    check initializeDefaultResources();
+    check initializeDefaultMachines();
 }

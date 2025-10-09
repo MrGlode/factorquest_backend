@@ -92,6 +92,27 @@ service /auth on new http:Listener(server_port +1) {
             };
         }
 
+        GameState|error gameState = createGameState(savedUser.id, 1000.0d);
+        if gameState is error {
+            log:printError("Erreur lors de la création de l'état de jeu", 'error = gameState);
+            return <http:InternalServerError>{
+                body: {
+                    message: "Erreur interne du serveur."
+                }
+            };
+        }
+
+        Inventory|error inventory = createInventory(savedUser.id);
+        if inventory is error {
+            log:printError("Erreur lors de la création de l'inventaire", 'error = inventory);
+            return <http:InternalServerError>{
+                body: {
+                    message: "Erreur interne du serveur."
+                }
+            };
+        }
+
+
         return {
             accessToken: accesToken,
             refreshToken: refreshToken,

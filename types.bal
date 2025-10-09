@@ -191,9 +191,7 @@ public type UpdateInveintoryRequest record {|
 |};
 
 public type CreateMachineRequest record {|
-    string userId;
     MachineType 'type;
-    decimal cost;
 |};
 
 public type UpdateMachineRequest record {|

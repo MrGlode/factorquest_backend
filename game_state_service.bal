@@ -64,7 +64,10 @@ public function updateGameState(string userId, UpdateGameStateRequest updateRequ
     }
 
     mongodb:Update update = {
-        "$set": updateFields
+        set: { "money": updateFields["money"],
+                "lastSavedTime": time:utcNow(),
+                "totalPlayTime": updateFields["totalPlayTime"]
+        }
     };
 
     mongodb:UpdateResult|mongodb:DatabaseError|mongodb:ApplicationError result = check gameStates->updateOne(filter, update);
@@ -145,25 +148,35 @@ public function updateInventory(string userId, InventoryItem[] items) returns er
     log:printInfo("Updated inventory for user: " + userId);
 }
 
-public function createMachine(CreateMachineRequest createRequest) returns Machine|error {
+public function createMachine(CreateMachineRequest createRequest, string userId) returns Machine|error {
     mongodb:Collection machines = check getCollection(MACHINES);
-
-    map<json> countFilter = {
-        "userId": createRequest.userId,
-        "type": createRequest.'type
-    };
-
-    int|mongodb:DatabaseError|mongodb:ApplicationError countResult = check machines->countDocuments(countFilter);
-    int machineCount = countResult is int ? countResult : 0;
 
     time:Utc now = time:utcNow();
 
+    Machine dbMachine = check findMachineByType(createRequest.'type);
+    decimal costMachine = 0.0d;
+    if dbMachine is Machine {
+        costMachine = dbMachine.cost;
+    } 
+
+    GameState state = check findGameStateByUserId(userId);
+    if state.money < costMachine {
+        return error("Fonds insuffisants : " + getMachineTypeName(createRequest.'type));
+    }
+
+    error? debitError = debitMoney(userId, costMachine);
+    if debitError is error {
+        _ = check machines->deleteOne({ "id": dbMachine.id });
+        log:printError("Échec du débit d'argent pour l'utilisateur : " + userId + " lors de la création de la machine de type : " + getMachineTypeName(createRequest.'type), 'error = debitError);
+        return error("Échec de la création de la machine en raison d'une erreur de paiement.");
+    }
+
     Machine machine = {
-        id: createRequest.'type + "_" + (machineCount + 1).toString(),
-        userId: createRequest.userId,
+        id: uuid:createType1AsString(),
+        userId: userId,
         'type: createRequest.'type,
-        name: getMachineTypeName(createRequest.'type) + " #" + (machineCount + 1).toString(),
-        cost: createRequest.cost,
+        name: dbMachine.name,
+        cost: costMachine,
         selectedRecipeId: (),
         lastProductionTime: now,
         pauseProgress: 0.0d,
@@ -172,9 +185,34 @@ public function createMachine(CreateMachineRequest createRequest) returns Machin
     };
     
     check machines->insertOne(machine);
-    Machine createdMachine = check findMachineById(machine.id, createRequest.userId);
-    log:printInfo("Created machine " + machine.id + " for user: " + createRequest.userId);
+    Machine createdMachine = check findMachineById(machine.id, userId);
+    log:printInfo("Created machine " + machine.id + " for user: " + userId);
     return createdMachine;
+}
+
+public function debitMoney(string userId, decimal amount) returns error? {
+    mongodb:Collection gameStates = check getCollection(GAME_STATES);
+    map<json> filter = {
+        "userId": userId
+    };
+    
+    mongodb:Update update = {
+        inc: { "money": -amount },
+        set: { "lastSavedTime": time:utcNow() }
+    };
+
+    mongodb:UpdateResult|mongodb:DatabaseError|mongodb:ApplicationError result = check gameStates->updateOne(filter, update);
+    if result is mongodb:DatabaseError|mongodb:ApplicationError {
+        log:printError("Error debiting money for user: " + userId, 'error = result);
+        return error("Failed to debit money.");
+    }
+
+    if result.matchedCount == 0 {
+        log:printInfo("No game state found to debit money for user: " + userId);
+        return error("Game state not found.");
+    }
+
+    log:printInfo("Debited " + amount.toString() + " from user: " + userId);
 }
 
 public function findMachinesByUserId(string userId) returns Machine[]|error {
@@ -260,7 +298,12 @@ public function updateMachine(string machineId, string userId, UpdateMachineRequ
     }
 
     mongodb:Update update = {
-        "$set": updateFields
+        set: {
+            "selectedRecipeId": updateFields["selectedRecipeId"],
+            "isActive": updateFields["isActive"],
+            "pauseProgress": updateFields["pauseProgress"],
+            "lastProductionTime": updateFields["lastProductionTime"]
+        }
     };
 
     mongodb:UpdateResult|mongodb:DatabaseError|mongodb:ApplicationError result = check machines->updateOne(filter, update);
@@ -299,7 +342,6 @@ public function deleteMachine(string machineId, string userId) returns error? {
     log:printInfo("Deleted machine " + machineId + " for user: " + userId);
 }
 
-
 function getMachineTypeName(MachineType machineType) returns string {
     match machineType {
         "mine" => {
@@ -315,7 +357,6 @@ function getMachineTypeName(MachineType machineType) returns string {
     return "Unknown";
 }
 
-// Obtenir l'état complet du jeu d'un joueur
 public function getCompleteGameState(string userId) returns GameStateResponse|error {
     GameState gameState = check findGameStateByUserId(userId);
     Inventory inventory = check findInventoryByUserId(userId);

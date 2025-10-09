@@ -1,5 +1,6 @@
 import ballerinax/mongodb;
 import ballerina/log;
+import ballerina/time;
 
 public function createResource(Resource res) returns Resource|error {
     mongodb:Collection resources = check getCollection(RESOURCES);
@@ -166,7 +167,7 @@ public function deleteRecipe(string recipeId) returns error? {
     log:printInfo("Recipe deleted successfully with ID: " + recipeId);
 }
 
-public function listRecipesByMachinetype(MachineType machineType) returns Recipe[]|error {
+public function listRecipesByMachineType(MachineType machineType) returns Recipe[]|error {
     mongodb:Collection recipes = check getCollection(RECIPES);
 
     map<json> filter = {
@@ -192,6 +193,82 @@ public function listRecipesByMachinetype(MachineType machineType) returns Recipe
     }
 
     return recipeList;
+}
+
+public function findMachineByType(MachineType machineType) returns Machine|error {
+    mongodb:Collection machines = check getCollection(MACHINES);
+
+    map<json> filter = {
+        'type: machineType,
+        userId: "SERVER_ADM"
+    };
+
+    Machine|mongodb:DatabaseError|mongodb:ApplicationError? result = check machines->findOne(filter);
+
+    if result is mongodb:ApplicationError|mongodb:DatabaseError {
+        log:printError("Failed to find machine by type", 'error = result);
+        return error("Error finding machine by type");
+    }
+
+    if result is () {
+        log:printInfo("Machine not found with type: " + machineType);
+        return error("Machine not found");
+    }
+
+    return result;
+}
+
+public function initializeDefaultMachines() returns error? {
+    mongodb:Collection machinesDb = check getCollection(MACHINES);
+    Machine[] defaultMachines = [
+        { 
+            id: "miner",
+            userId: "SERVER_ADM",
+            'type: "mine", 
+            name: "Mine",
+            cost: 100.0d,
+            selectedRecipeId: "",
+            lastProductionTime: time:utcNow(),
+            pauseProgress: 0.0d,
+            isActive: false,
+            createdAt: time:utcNow() 
+        },
+        { 
+            id: "furnace",
+            userId: "SERVER_ADM",
+            'type: "furnace", 
+            name: "Furnace",
+            cost: 200.0d,
+            selectedRecipeId: "",
+            lastProductionTime: time:utcNow(),
+            pauseProgress: 0.0d,
+            isActive: false,
+            createdAt: time:utcNow() 
+        },
+        { 
+            id: "assembler",
+            userId: "SERVER_ADM",
+            'type: "assembler", 
+            name: "Assembler",
+            cost: 500.0d,
+            selectedRecipeId: "",
+            lastProductionTime: time:utcNow(),
+            pauseProgress: 0.0d,
+            isActive: false,
+            createdAt: time:utcNow() 
+        }
+    ];
+
+    foreach Machine machine in defaultMachines {
+        Machine|error existingMachine = findMachineByType(machine.'type);
+        if existingMachine is error {
+            check machinesDb->insertOne(machine);
+        } else {
+            log:printInfo("Machine already exists: " + machine.'type);
+        }        
+    }
+
+    log:printInfo("Default machines initialization complete.");
 }
 
 public function initializeDefaultResources() returns error? {
@@ -297,5 +374,6 @@ public function initializeDefaultRecipes() returns error? {
             log:printInfo("Recipe already exists: " + rec.id);
         }        
     }
+    log:printInfo("Default recipes initialization complete.");
 }
 
