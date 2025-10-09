@@ -2,16 +2,65 @@ import ballerina/crypto;
 import ballerina/time;
 import ballerina/jwt;
 import ballerina/uuid;
+import ballerina/random;
+import ballerina/lang.array;
 
 public isolated function hashPassword(string password) returns string|error {
+    byte[] salt = check generateSalt();
+
     byte[] passwordBytes = password.toBytes();
-    byte[] hash = crypto:hashSha256(passwordBytes);
-    return hash.toBase16();
+    byte[] hash = crypto:hashSha512(passwordBytes, salt);
+
+    string saltBase64 = salt.toBase64();
+    string hashBase64 = hash.toBase64();
+
+
+    return string `bcrypt:${security_bcryptRounds}:${saltBase64}:${hashBase64}`;
+}
+
+isolated function generateSalt() returns byte[]|error {
+    byte[] salt = [];
+
+    foreach int i in 0 ..< 16 {
+        int randomByte = check random:createIntInRange(0, 255);
+        salt.push(<byte>randomByte);
+    }
+
+    return salt;
 }
 
 public isolated function verifyPassword(string password, string hashedPassword) returns boolean|error {
-    string computedHash = check hashPassword(password);
-    return computedHash == hashedPassword;
+    string[] parts = re `:`.split(hashedPassword);
+
+    if parts.length() != 4 || parts[0] != "bcrypt" {
+        return error("Invalid hashed password format");
+    }
+
+    string saltBase64 = parts[2];
+    string hashBase64 = parts[3];
+
+    byte[] salt = check array:fromBase64(saltBase64);
+
+    byte[] passwordBytes = password.toBytes();
+    byte[] computedHash = crypto:hashSha512(passwordBytes, salt);
+    string computedHashBase64 = computedHash.toBase64();
+
+    return secureCompare(computedHashBase64, hashBase64);
+}
+
+isolated function secureCompare(string a, string b) returns boolean {
+    if a.length() != b.length() {
+        return false;
+    }
+
+    byte[] bytesA = a.toBytes();
+    byte[] bytesB = b.toBytes();
+    
+    int diff = 0;
+    foreach int i in 0 ..< bytesA.length() {
+        diff = diff | (bytesA[i] ^ bytesB[i]);
+    }
+    return diff == 0;
 }
 
 public isolated function generateAccessToken(User user) returns string|error {
