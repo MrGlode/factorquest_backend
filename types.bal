@@ -206,3 +206,86 @@ public type GameStateResponse record {|
     Inventory inventory;
     Machine[] machines;
 |};
+
+public type ClientType "noble"|"factory"|"government"|"merchant"|"engineer";
+
+public type TransactionType "market"|"order";
+
+public type MarketPrice record {|
+    string id?;
+    string resourceId;
+    decimal basePrice;
+    decimal currentPrice;
+    decimal demand;
+    time:Utc lastSold;
+    time:Utc updatedAt;
+|};
+
+public type OrderRequirement record {|
+    string resourceId;
+    int quantity;
+|};
+
+public type SpecialOrder record {|
+    string id;
+    string userId;
+    string clientName;
+    ClientType clientType;
+    OrderRequirement[] requirements;
+    decimal reward;
+    decimal bonus;
+    time:Utc deadLine;
+    string description;
+    boolean isCompleted;
+    boolean isExpired;
+    time:Utc createdAt;
+    time:Utc? completedAt;
+|};
+
+public type Transaction record {|
+    string id;
+    string userId;
+    string resourceId;
+    int quantity;
+    decimal unitPrice;
+    decimal totalValue;
+    time:Utc timestamp;
+    TransactionType 'type;
+    string? orderId;
+|};
+
+public type SellResourceRequest record {|
+    string resourceId;
+    int quantity;
+|};
+
+public type SellResourceResponse record {|
+    decimal earnings;
+    decimal newBalance;
+    MarketPrice updatedPrice;
+    Transaction 'transaction;
+|};
+
+public type FulfillOrderRequest record {|
+    string orderId;
+|};
+public type FulfillOrderResponse record {|
+    boolean success;
+    string message;
+    decimal reward;
+    decimal newBalance;
+    Transaction? 'transaction;
+|};
+
+public type SpecialOrderResponse record {|
+    SpecialOrder[] orders;
+|};
+
+public type MarketPricesResponse record {|
+    MarketPrice[] prices;
+|};
+
+public type TransactionsResponse record {|
+    Transaction[] transactions;
+    int total;
+|};
