@@ -40,4 +40,6 @@ public function main() returns error? {
     check initializeDefaultMarketBasePrices();
     check initializeDefaultMarketClients();
     check initializeDefaultMarketMultipliers();
+    check initializeDefaultLaboratoryTypes();
+    check initializeDefaultResearches();
 }

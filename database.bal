@@ -9,7 +9,6 @@ public enum CollectionNames {
     GAME_STATES = "game_states",
     INVENTORIES = "inventories",
     MACHINES = "machines",
-    RESEARCHES = "researches",
     ACHIEVEMENTS = "achievements",
     LEADERBOARD = "leaderboard",
     TRANSACTIONS = "transactions",
@@ -20,7 +19,12 @@ public enum CollectionNames {
     MARKET_CLIENTS = "market_clients",
     MARKET_CLIENTS_MULTIPLIERS = "market_clients_multipliers",
     MARKET_PRICES = "market_prices",
-    SPECIAL_ORDERS = "special_orders"
+    SPECIAL_ORDERS = "special_orders",
+    LABORATORY_TYPES = "laboratory_types",
+    LABORATORIES = "laboratories",
+    RESEARCHES = "researches",
+    RESEARCH_PROGRESS = "research_progress",
+    COMPLETED_RESEARCHES = "completed_researches"
 };
 
 function initMongoClient() returns mongodb:Client|error {

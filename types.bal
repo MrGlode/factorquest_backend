@@ -306,3 +306,115 @@ public type MarketClientMultiplier record {|
     ClientType 'type;
     decimal multiplier;
 |};
+
+public type LaboratoryType "basic"|"advanced"|"institute"|"mining"|"metallurgy"|"mechanical";
+
+public type LaboratorySpecialization "mine"|"furnace"|"assembler"|"general";
+
+public type ResearchCategory "mine"|"furnace"|"assembler"|"general";
+
+public type ResearchEffectType "speed"|"efficiency"|"unlock_recipe"|"cost_reduction"|"bonus_output";
+
+public type Laboratory record {|
+    string id;
+    string userId;
+    LaboratoryType 'type;
+    string name;
+    decimal cost;
+    decimal researchSpeed;  // Multiplicateur de vitesse (1.0 = 100%, 1.5 = 150%)
+    int maxSimultaneousResearch;
+    LaboratorySpecialization? specialization;
+    time:Utc purchaseTime;
+|};
+
+public type ResearchEffect record {|
+    ResearchEffectType 'type;
+    LaboratorySpecialization target;  // "mine", "furnace", "assembler", ou "all" (mais on utilise "general" pour "all")
+    decimal value;  // Valeur en % ou absolue
+    string description;
+|};
+
+public type Research record {|
+    string id;
+    string name;
+    string description;
+    ResearchCategory category;
+    ResearchRequirement[] requirements;  // Ressources nécessaires
+    decimal duration;  // Durée en secondes
+    string[] prerequisites;  // IDs des recherches requises avant
+    ResearchEffect[] effects;
+    string icon;
+|};
+
+public type ResearchRequirement record {|
+    string resourceId;
+    int quantity;
+|};
+
+public type ResearchProgress record {|
+    string id;
+    string userId;
+    string researchId;
+    string laboratoryId;
+    time:Utc startTime;
+    time:Utc estimatedEndTime;
+    decimal progress;  // 0.0 à 1.0
+|};
+
+public type CompletedResearch record {|
+    string id;
+    string userId;
+    string researchId;
+    time:Utc completedAt;
+|};
+
+public type PurchaseLaboratoryRequest record {|
+    LaboratoryType 'type;
+|};
+
+public type PurchaseLaboratoryResponse record {|
+    Laboratory laboratory;
+    decimal newBalance;
+|};
+
+public type StartResearchRequest record {|
+    string researchId;
+    string laboratoryId;
+|};
+
+public type StartResearchResponse record {|
+    ResearchProgress progress;
+    Research research;
+|};
+
+public type LaboratoriesResponse record {|
+    Laboratory[] laboratories;
+|};
+
+public type ResearchesResponse record {|
+    Research[] researches;
+|};
+
+public type ActiveResearchesResponse record {|
+    ResearchProgress[] activeResearches;
+|};
+
+public type CompletedResearchesResponse record {|
+    CompletedResearch[] completedResearches;
+|};
+
+public type ActiveEffectsResponse record {|
+    ResearchEffect[] effects;
+    map<decimal> bonuses;  // Ex: {"mine_speed": 0.25, "furnace_efficiency": 0.15}
+|};
+
+public type LaboratoryTypeInfo record {|
+    LaboratoryType 'type;
+    string name;
+    decimal cost;
+    decimal researchSpeed;
+    int maxSimultaneousResearch;
+    LaboratorySpecialization? specialization;
+    string icon;
+    string description;
+|};
