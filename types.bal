@@ -207,12 +207,13 @@ public type GameStateResponse record {|
     Machine[] machines;
 |};
 
-public type ClientType "noble"|"factory"|"government"|"merchant"|"engineer";
+public type ClientType "noble"|"factory"|"government"|"merchant";
 
 public type TransactionType "market"|"order";
 
 public type MarketPrice record {|
     string id?;
+    string userId;
     string resourceId;
     decimal basePrice;
     decimal currentPrice;
@@ -234,7 +235,7 @@ public type SpecialOrder record {|
     OrderRequirement[] requirements;
     decimal reward;
     decimal bonus;
-    time:Utc deadLine;
+    time:Utc deadline;
     string description;
     boolean isCompleted;
     boolean isExpired;
@@ -288,4 +289,20 @@ public type MarketPricesResponse record {|
 public type TransactionsResponse record {|
     Transaction[] transactions;
     int total;
+|};
+
+public type MarketBasePrice record {|
+    string resourceId;
+    decimal basePrice;
+|};
+
+public type MarketClient record {|
+    string id;
+    ClientType 'type;
+    string name;
+|};
+
+public type MarketClientMultiplier record {|
+    ClientType 'type;
+    decimal multiplier;
 |};

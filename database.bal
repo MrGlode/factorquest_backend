@@ -15,7 +15,12 @@ public enum CollectionNames {
     TRANSACTIONS = "transactions",
     RESET_TOKENS = "reset_tokens",
     RESOURCES = "resources",
-    RECIPES = "recipes"
+    RECIPES = "recipes",
+    MARKET_BASE_PRICES = "market_base_prices",
+    MARKET_CLIENTS = "market_clients",
+    MARKET_CLIENTS_MULTIPLIERS = "market_clients_multipliers",
+    MARKET_PRICES = "market_prices",
+    SPECIAL_ORDERS = "special_orders"
 };
 
 function initMongoClient() returns mongodb:Client|error {

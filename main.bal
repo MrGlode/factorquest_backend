@@ -37,4 +37,7 @@ public function main() returns error? {
     check initializeDefaultRecipes();
     check initializeDefaultResources();
     check initializeDefaultMachines();
+    check initializeDefaultMarketBasePrices();
+    check initializeDefaultMarketClients();
+    check initializeDefaultMarketMultipliers();
 }
