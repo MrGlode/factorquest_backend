@@ -1,0 +1,278 @@
+openapi: 3.0.0
+info:
+  title: FactorQuest Research
+  description: Laboratories and research management
+  contact:
+    name: FactorQuest support
+    url: 'https://www.factorquest.fr/support'
+    email: factorquest@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:9095/research'
+tags:
+  - name: Laboratories
+    description: Laboratories Tag
+  - name: Researches
+    description: Researches Tag
+  - name: Research Progress
+    description: Research Progress Tag
+  - name: Research Effects
+    description: Research Effects Tag
+paths:
+  /laboratories:
+    get:
+      tags:
+        - Laboratories
+      summary: Get user laboratories
+      operationId: getLaboratories
+      responses:
+        '200':
+          description: Success
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+    post:
+      tags:
+        - Laboratories
+      summary: Purchase laboratory
+      operationId: purchaseLaboratory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - type
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - basic
+                    - advanced
+                    - institute
+                    - mining
+                    - metallurgy
+                    - mechanical
+        required: true
+      responses:
+        '200':
+          description: Purchased
+        '400':
+          description: Insufficient funds
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /available:
+    get:
+      tags:
+        - Researches
+      summary: List available researches
+      operationId: getAvailableResearches
+      responses:
+        '200':
+          description: Success
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  '/available/{researchId}':
+    get:
+      tags:
+        - Researches
+      summary: Get research details
+      operationId: getResearch
+      parameters:
+        - name: researchId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+        '404':
+          description: Not found
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /active:
+    get:
+      tags:
+        - Research Progress
+      summary: Get active researches
+      operationId: getActiveResearches
+      responses:
+        '200':
+          description: Success
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /start:
+    post:
+      tags:
+        - Research Progress
+      summary: Start research
+      operationId: startResearch
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - laboratoryId
+                - researchId
+              type: object
+              properties:
+                researchId:
+                  type: string
+                laboratoryId:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: Started
+        '400':
+          description: Cannot start
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  '/complete/{researchId}':
+    post:
+      tags:
+        - Research Progress
+      summary: Complete research
+      operationId: completeResearch
+      parameters:
+        - name: researchId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Completed
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /completed:
+    get:
+      tags:
+        - Research Progress
+      summary: Get completed researches
+      operationId: getCompletedResearches
+      responses:
+        '200':
+          description: Success
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /effects:
+    get:
+      tags:
+        - Research Effects
+      summary: Get active effects and bonuses
+      operationId: getEffects
+      responses:
+        '200':
+          description: Success
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+components:
+  securitySchemes:
+    default:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
+          scopes: {}
+x-wso2-auth-header: Authorization
+x-wso2-api-key-header: ApiKey
+x-wso2-cors:
+  corsConfigurationEnabled: false
+  accessControlAllowOrigins:
+    - '*'
+  accessControlAllowCredentials: false
+  accessControlAllowHeaders:
+    - authorization
+    - Access-Control-Allow-Origin
+    - Content-Type
+    - SOAPAction
+    - apikey
+    - Internal-Key
+  accessControlAllowMethods:
+    - GET
+    - PUT
+    - POST
+    - DELETE
+    - PATCH
+    - OPTIONS
+x-wso2-production-endpoints:
+  urls:
+    - 'http://localhost:9095'
+  type: http
+x-wso2-sandbox-endpoints:
+  urls:
+    - 'http://localhost:9095'
+  type: http
+x-wso2-basePath: /research/1.0.0
+x-wso2-transports:
+  - http
+  - https
+x-wso2-application-security:
+  security-types:
+    - oauth2
+  optional: false
+x-wso2-response-cache:
+  enabled: false
+  cacheTimeoutInSeconds: 300

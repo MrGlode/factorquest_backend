@@ -1,0 +1,181 @@
+openapi: 3.0.0
+info:
+  title: FactorQuest Health
+  description: Health check and version information for FactoQuest Backend
+  contact:
+    name: FactorQuest support
+    url: 'https://www.factorquest.fr/support'
+    email: factorquest@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:9090'
+    description: Main Backend Service
+tags:
+  - name: System
+    description: System health and version endpoints
+paths:
+  /health:
+    get:
+      tags:
+        - System
+      summary: Health check endpoint
+      description: Returns the health status of the FactoQuest backend service
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service is healthy and running
+          content:
+            application/json:
+              schema:
+                required:
+                  - environment
+                  - service
+                  - status
+                  - timestamp
+                  - version
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: Health status of the service
+                    example: healthy
+                    enum:
+                      - healthy
+                      - unhealthy
+                  service:
+                    type: string
+                    description: Service name
+                    example: FactoQuest Backend
+                  version:
+                    type: string
+                    description: Current version of the service
+                    example: 0.1.0
+                  environment:
+                    type: string
+                    description: Current environment
+                    example: development
+                    enum:
+                      - development
+                      - staging
+                      - production
+                  timestamp:
+                    maxItems: 2
+                    minItems: 2
+                    type: array
+                    description: 'Current UTC timestamp as [seconds, nanoseconds]'
+                    example:
+                      - 1728000000
+                      - 500000000
+                    items:
+                      type: number
+              examples:
+                healthy:
+                  summary: Healthy service response
+                  value:
+                    status: healthy
+                    service: FactoQuest Backend
+                    version: 0.1.0
+                    environment: development
+                    timestamp:
+                      - 1728000000
+                      - 500000000
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /version:
+    get:
+      tags:
+        - System
+      summary: Get API version information
+      description: Returns version information and API prefix for the service
+      operationId: getVersion
+      responses:
+        '200':
+          description: API version information
+          content:
+            application/json:
+              schema:
+                required:
+                  - apiPrefix
+                  - version
+                type: object
+                properties:
+                  version:
+                    pattern: ^\d+\.\d+\.\d+$
+                    type: string
+                    description: Current API version
+                    example: 1.0.0
+                  apiPrefix:
+                    type: string
+                    description: API URL prefix for versioned endpoints
+                    example: /api/v1
+              examples:
+                current:
+                  summary: Current version response
+                  value:
+                    version: 1.0.0
+                    apiPrefix: /api/v1
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+components:
+  securitySchemes:
+    default:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
+          scopes: {}
+x-wso2-auth-header: Authorization
+x-wso2-api-key-header: ApiKey
+x-wso2-cors:
+  corsConfigurationEnabled: false
+  accessControlAllowOrigins:
+    - '*'
+  accessControlAllowCredentials: false
+  accessControlAllowHeaders:
+    - authorization
+    - Access-Control-Allow-Origin
+    - Content-Type
+    - SOAPAction
+    - apikey
+    - Internal-Key
+  accessControlAllowMethods:
+    - GET
+    - PUT
+    - POST
+    - DELETE
+    - PATCH
+    - OPTIONS
+x-wso2-production-endpoints:
+  urls:
+    - 'http://localhost:9090'
+  type: http
+x-wso2-sandbox-endpoints:
+  urls:
+    - 'http://localhost:9090'
+  type: http
+x-wso2-basePath: /main/1.0.0
+x-wso2-transports:
+  - http
+  - https
+x-wso2-application-security:
+  security-types:
+    - oauth2
+  optional: false
+x-wso2-response-cache:
+  enabled: false
+  cacheTimeoutInSeconds: 300

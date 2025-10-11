@@ -1,0 +1,252 @@
+openapi: 3.0.0
+info:
+  title: FactorQuest Auth
+  description: Authentication and user management
+  contact:
+    name: FactorQuest support
+    url: 'https://www.factorquest.fr/support'
+    email: factorquest@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:9091/auth'
+tags:
+  - name: Authentication
+    description: Authentication Tag
+  - name: Password Reset
+    description: Password Reset Tag
+paths:
+  /register:
+    post:
+      tags:
+        - Authentication
+      summary: Register new user
+      description: Register new user
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - email
+                - password
+                - username
+              type: object
+              properties:
+                username:
+                  minLength: 3
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  minLength: 8
+                  type: string
+                displayName:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+        '409':
+          description: Email exists
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: User login
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - password
+                - username
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: Success
+        '401':
+          description: Invalid credentials
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh token
+      description: Refresh token
+      operationId: refresh
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - refreshToken
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: Success
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /me:
+    get:
+      tags:
+        - Authentication
+      summary: Get current user
+      description: Get current user
+      operationId: getMe
+      responses:
+        '200':
+          description: Success
+        '401':
+          description: Unauthorized
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /forgot-password:
+    post:
+      tags:
+        - Password Reset
+      summary: Request password reset
+      description: Request password reset
+      operationId: forgotPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - email
+              type: object
+              properties:
+                email:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: Email sent
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /reset-password:
+    post:
+      tags:
+        - Password Reset
+      summary: Reset password
+      description: Reset password
+      operationId: resetPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - newPassword
+                - token
+              type: object
+              properties:
+                token:
+                  type: string
+                newPassword:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: Password reset
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+components:
+  securitySchemes:
+    default:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
+          scopes: {}
+x-wso2-auth-header: Authorization
+x-wso2-api-key-header: ApiKey
+x-wso2-cors:
+  corsConfigurationEnabled: false
+  accessControlAllowOrigins:
+    - '*'
+  accessControlAllowCredentials: false
+  accessControlAllowHeaders:
+    - authorization
+    - Access-Control-Allow-Origin
+    - Content-Type
+    - SOAPAction
+    - apikey
+    - Internal-Key
+  accessControlAllowMethods:
+    - GET
+    - PUT
+    - POST
+    - DELETE
+    - PATCH
+    - OPTIONS
+x-wso2-production-endpoints:
+  urls:
+    - 'http://host.docker.internal:9091/auth'
+  type: http
+x-wso2-basePath: /auth/1.0.0
+x-wso2-transports:
+  - http
+  - https
+x-wso2-application-security:
+  security-types:
+    - oauth2
+  optional: false
+x-wso2-response-cache:
+  enabled: false
+  cacheTimeoutInSeconds: 300

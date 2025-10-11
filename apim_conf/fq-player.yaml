@@ -1,0 +1,234 @@
+openapi: 3.0.0
+info:
+  title: FactorQuest Player
+  description: 'Player profiles, stats, and leaderboard'
+  contact:
+    name: FactorQuest support
+    url: 'https://www.factorquest.fr/support'
+    email: factorquest@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:9092/players'
+tags:
+  - name: Player
+    description: Player Tag
+  - name: Password Reset
+    description: Password Reset Tag
+paths:
+  /profile:
+    get:
+      tags:
+        - Player
+      summary: Get player profile
+      operationId: getProfile
+      responses:
+        '200':
+          description: Success
+        '401':
+          description: Unauthorized
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+    delete:
+      tags:
+        - Player
+      summary: Delete player profile
+      operationId: deleteProfile
+      responses:
+        '200':
+          description: Deleted
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /stats:
+    put:
+      tags:
+        - Player
+      summary: Update player stats
+      operationId: updateStats
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Updated
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /increment-stat:
+    post:
+      tags:
+        - Player
+      summary: Increment a stat
+      operationId: incrementStat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - amount
+                - statName
+              type: object
+              properties:
+                statName:
+                  type: string
+                amount:
+                  type: number
+        required: true
+      responses:
+        '200':
+          description: Incremented
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /level:
+    put:
+      tags:
+        - Player
+      summary: Update level and XP
+      operationId: updateLevel
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - experience
+                - level
+              type: object
+              properties:
+                level:
+                  minimum: 1
+                  type: integer
+                experience:
+                  minimum: 0
+                  type: integer
+        required: true
+      responses:
+        '200':
+          description: Updated
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /leaderboard:
+    get:
+      tags:
+        - Player
+      summary: Get leaderboard
+      operationId: getLeaderboard
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Success
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /count:
+    get:
+      tags:
+        - Player
+      summary: Count total players
+      operationId: countPlayers
+      responses:
+        '200':
+          description: Success
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+components:
+  securitySchemes:
+    default:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
+          scopes: {}
+x-wso2-api-key-header: ApiKey
+x-wso2-auth-header: Authorization
+x-wso2-cors:
+  corsConfigurationEnabled: false
+  accessControlAllowOrigins:
+    - '*'
+  accessControlAllowCredentials: false
+  accessControlAllowHeaders:
+    - authorization
+    - Access-Control-Allow-Origin
+    - Content-Type
+    - SOAPAction
+    - apikey
+    - Internal-Key
+  accessControlAllowMethods:
+    - GET
+    - PUT
+    - POST
+    - DELETE
+    - PATCH
+    - OPTIONS
+x-wso2-production-endpoints:
+  urls:
+    - 'http://localhost:9092'
+  type: http
+x-wso2-sandbox-endpoints:
+  urls:
+    - 'http://localhost:9092'
+  type: http
+x-wso2-basePath: /player/1.0.0
+x-wso2-transports:
+  - http
+  - https
+x-wso2-application-security:
+  security-types:
+    - oauth2
+  optional: false
+x-wso2-response-cache:
+  enabled: false
+  cacheTimeoutInSeconds: 300

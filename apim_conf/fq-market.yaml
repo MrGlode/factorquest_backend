@@ -1,0 +1,244 @@
+openapi: 3.0.0
+info:
+  title: FactorQuest Market
+  description: 'Market prices, trading, and special orders'
+  contact:
+    name: FactorQuest support
+    url: 'https://www.factorquest.fr/support'
+    email: factorquest@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:9094/market'
+tags:
+  - name: Market
+    description: Market Tag
+  - name: Orders
+    description: Orders Tag
+paths:
+  /prices:
+    get:
+      tags:
+        - Market
+      summary: Get market prices
+      operationId: getPrices
+      responses:
+        '200':
+          description: Success
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /sell:
+    post:
+      tags:
+        - Market
+      summary: Sell resources
+      operationId: sellResource
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - quantity
+                - resourceId
+              type: object
+              properties:
+                resourceId:
+                  type: string
+                quantity:
+                  minimum: 1
+                  type: integer
+        required: true
+      responses:
+        '200':
+          description: Sold
+        '400':
+          description: Insufficient resources
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /orders:
+    get:
+      tags:
+        - Orders
+      summary: Get active special orders
+      operationId: getOrders
+      responses:
+        '200':
+          description: Success
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  '/orders/{orderId}/fulfill':
+    post:
+      tags:
+        - Orders
+      summary: Fulfill special order
+      operationId: fulfillOrder
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Fulfilled
+        '400':
+          description: Cannot fulfill
+        '404':
+          description: Order not found
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /transactions:
+    get:
+      tags:
+        - Market
+      summary: Get transaction history
+      operationId: getTransactions
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: Success
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /orders/generate:
+    post:
+      tags:
+        - Orders
+      summary: Generate new special order
+      operationId: generateOrder
+      responses:
+        '200':
+          description: Generated
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /prices/update:
+    put:
+      tags:
+        - Market
+      summary: Update market prices
+      operationId: updatePrices
+      responses:
+        '200':
+          description: Updated
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /initialize-prices:
+    post:
+      tags:
+        - Market
+      summary: Initialize market prices (first time)
+      operationId: initializePrices
+      responses:
+        '200':
+          description: Initialized
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+components:
+  securitySchemes:
+    default:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
+          scopes: {}
+x-wso2-auth-header: Authorization
+x-wso2-api-key-header: ApiKey
+x-wso2-cors:
+  corsConfigurationEnabled: false
+  accessControlAllowOrigins:
+    - '*'
+  accessControlAllowCredentials: false
+  accessControlAllowHeaders:
+    - authorization
+    - Access-Control-Allow-Origin
+    - Content-Type
+    - SOAPAction
+    - apikey
+    - Internal-Key
+  accessControlAllowMethods:
+    - GET
+    - PUT
+    - POST
+    - DELETE
+    - PATCH
+    - OPTIONS
+x-wso2-production-endpoints:
+  urls:
+    - 'http://localhost:9094'
+  type: http
+x-wso2-sandbox-endpoints:
+  urls:
+    - 'http://localhost:9094'
+  type: http
+x-wso2-basePath: /market/1.0.0
+x-wso2-transports:
+  - http
+  - https
+x-wso2-application-security:
+  security-types:
+    - oauth2
+  optional: false
+x-wso2-response-cache:
+  enabled: false
+  cacheTimeoutInSeconds: 300

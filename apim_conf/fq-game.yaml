@@ -1,0 +1,379 @@
+openapi: 3.0.0
+info:
+  title: FactorQuest Game
+  description: 'Game resources, machines, and state management'
+  contact:
+    name: FactorQuest support
+    url: 'https://www.factorquest.fr/support'
+    email: factorquest@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:9093/game'
+tags:
+  - name: Resources
+    description: Resources tag
+  - name: Recipes
+    description: Recipes tag
+  - name: Game State
+    description: Game State tag
+  - name: Inventory
+    description: Inventory tag
+  - name: Machines
+    description: Machines tag
+paths:
+  /resources:
+    get:
+      tags:
+        - Resources
+      summary: List all resources
+      operationId: listResources
+      responses:
+        '200':
+          description: Success
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  '/resource/{resourceId}':
+    get:
+      tags:
+        - Resources
+      summary: Get resource by ID
+      operationId: getResource
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+        '404':
+          description: Not found
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /recipes:
+    get:
+      tags:
+        - Recipes
+      summary: List recipes
+      operationId: listRecipes
+      parameters:
+        - name: machineType
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - mine
+              - furnace
+              - assembler
+      responses:
+        '200':
+          description: Success
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  '/recipe/{recipeId}':
+    get:
+      tags:
+        - Recipes
+      summary: Get recipe by ID
+      operationId: getRecipe
+      parameters:
+        - name: recipeId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+      security:
+        - default: []
+      x-auth-type: None
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /state:
+    get:
+      tags:
+        - Game State
+      summary: Get game state
+      operationId: getState
+      responses:
+        '200':
+          description: Success
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+    put:
+      tags:
+        - Game State
+      summary: Update game state
+      operationId: updateState
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Updated
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /inventory:
+    get:
+      tags:
+        - Inventory
+      summary: Get inventory
+      operationId: getInventory
+      responses:
+        '200':
+          description: Success
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+    put:
+      tags:
+        - Inventory
+      summary: Update inventory
+      operationId: updateInventory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+        required: true
+      responses:
+        '200':
+          description: Updated
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  /machines:
+    get:
+      tags:
+        - Machines
+      summary: List machines
+      operationId: listMachines
+      responses:
+        '200':
+          description: Success
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+    post:
+      tags:
+        - Machines
+      summary: Create machine
+      operationId: createMachine
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - type
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - mine
+                    - furnace
+                    - assembler
+        required: true
+      responses:
+        '200':
+          description: Created
+        '422':
+          description: Insufficient funds
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+  '/machines/{machineId}':
+    get:
+      tags:
+        - Machines
+      summary: Get machine
+      operationId: getMachine
+      parameters:
+        - name: machineId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+    put:
+      tags:
+        - Machines
+      summary: Update machine
+      operationId: updateMachine
+      parameters:
+        - name: machineId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Updated
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+    delete:
+      tags:
+        - Machines
+      summary: Delete machine
+      operationId: deleteMachine
+      parameters:
+        - name: machineId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deleted
+      security:
+        - default: []
+      x-auth-type: Application & Application User
+      x-throttling-tier: Unlimited
+      x-wso2-application-security:
+        security-types:
+          - oauth2
+        optional: false
+components:
+  securitySchemes:
+    default:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: 'https://localhost:9443/oauth2/authorize'
+          scopes: {}
+x-wso2-auth-header: Authorization
+x-wso2-api-key-header: ApiKey
+x-wso2-cors:
+  corsConfigurationEnabled: false
+  accessControlAllowOrigins:
+    - '*'
+  accessControlAllowCredentials: false
+  accessControlAllowHeaders:
+    - authorization
+    - Access-Control-Allow-Origin
+    - Content-Type
+    - SOAPAction
+    - apikey
+    - Internal-Key
+  accessControlAllowMethods:
+    - GET
+    - PUT
+    - POST
+    - DELETE
+    - PATCH
+    - OPTIONS
+x-wso2-production-endpoints:
+  urls:
+    - 'http://localhost:9093'
+  type: http
+x-wso2-sandbox-endpoints:
+  urls:
+    - 'http://localhost:9093'
+  type: http
+x-wso2-basePath: /game/1.0.0
+x-wso2-transports:
+  - http
+  - https
+x-wso2-application-security:
+  security-types:
+    - oauth2
+  optional: false
+x-wso2-response-cache:
+  enabled: false
+  cacheTimeoutInSeconds: 300
