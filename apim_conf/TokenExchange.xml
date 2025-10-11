@@ -1,0 +1,5 @@
+<sequence xmlns="http://ws.apache.org/ns/synapse" name="TokenExchange">
+    <property name="AppAuth" expression="get-property('transport', 'AppAuth')"/>
+    <property name="Authorization" expression="get-property('AppAuth')" scope="transport"/>
+    <property name="AppAuth" scope="transport" action="remove"/>
+</sequence>
