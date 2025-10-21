@@ -62,9 +62,9 @@ service /game on new http:Listener(server_port + 3) {
         return recipe;
     }
 
-    resource function get state(@http:Header string Authorization) returns GameStateResponse|http:Unauthorized|http:NotFound|http:InternalServerError {
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
+    resource function get state(@http:Header string appauth) returns GameStateResponse|http:Unauthorized|http:NotFound|http:InternalServerError {
+        //string token = appauth.substring(7);
+        JwtPayload|error payload = validateToken(appauth);
         if (payload is error) {
             log:printError("Token invalide", 'error = payload);
             return <http:Unauthorized>{
@@ -86,9 +86,8 @@ service /game on new http:Listener(server_port + 3) {
         return state;
     }
 
-    resource function put state(@http:Header string Authorization, UpdateGameStateRequest req) returns http:Ok|http:Unauthorized|http:InternalServerError {
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
+    resource function put state(@http:Header string appauth, UpdateGameStateRequest req) returns http:Ok|http:Unauthorized|http:InternalServerError {
+        JwtPayload|error payload = validateToken(appauth);
         if (payload is error) {
             log:printError("Token invalide", 'error = payload);
             return <http:Unauthorized>{
@@ -115,9 +114,8 @@ service /game on new http:Listener(server_port + 3) {
         };
     }
 
-    resource function get inventory(@http:Header string Authorization) returns Inventory|http:Unauthorized|http:NotFound|http:InternalServerError {
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
+    resource function get inventory(@http:Header string appauth) returns Inventory|http:Unauthorized|http:NotFound|http:InternalServerError {
+        JwtPayload|error payload = validateToken(appauth);
         if (payload is error) {
             log:printError("Token invalide", 'error = payload);
             return <http:Unauthorized>{
@@ -139,9 +137,8 @@ service /game on new http:Listener(server_port + 3) {
         return inventory;
     }
 
-    resource function put inventory(@http:Header string Authorization, InventoryItem[] items) returns http:Ok|http:Unauthorized|http:InternalServerError {
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
+    resource function put inventory(@http:Header string appauth, InventoryItem[] items) returns http:Ok|http:Unauthorized|http:InternalServerError {
+        JwtPayload|error payload = validateToken(appauth);
         
         if payload is error {
             return <http:Unauthorized>{
@@ -169,9 +166,8 @@ service /game on new http:Listener(server_port + 3) {
         };
     }
 
-    resource function get machines(@http:Header string Authorization) returns Machine[]|http:Unauthorized|http:NotFound|http:InternalServerError {
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
+    resource function get machines(@http:Header string appauth) returns Machine[]|http:Unauthorized|http:NotFound|http:InternalServerError {
+        JwtPayload|error payload = validateToken(appauth);
         if (payload is error) {
             log:printError("Token invalide", 'error = payload);
             return <http:Unauthorized>{
@@ -193,9 +189,8 @@ service /game on new http:Listener(server_port + 3) {
         return machines;
     }
 
-    resource function post machines(@http:Header string Authorization, CreateMachineRequest req) returns Machine|http:Unauthorized|http:InternalServerError|http:UnprocessableEntity {
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
+    resource function post machines(@http:Header string appauth, CreateMachineRequest req) returns Machine|http:Unauthorized|http:InternalServerError|http:UnprocessableEntity {
+        JwtPayload|error payload = validateToken(appauth);
         if (payload is error) {
             log:printError("Token invalide", 'error = payload);
             return <http:Unauthorized>{
@@ -233,12 +228,9 @@ service /game on new http:Listener(server_port + 3) {
         return createdMachine;
     }
 
-    resource function get machines/[string machineId](@http:Header string Authorization) returns Machine|http:Unauthorized|http:NotFound|http:InternalServerError {
-        
-        // Valider le token
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
-        
+    resource function get machines/[string machineId](@http:Header string appauth) returns Machine|http:Unauthorized|http:NotFound|http:InternalServerError {
+        JwtPayload|error payload = validateToken(appauth);
+
         if payload is error {
             return <http:Unauthorized>{
                 body: {
@@ -270,11 +262,8 @@ service /game on new http:Listener(server_port + 3) {
         return machine;
     }
 
-    resource function put machines/[string machineId](@http:Header string Authorization, UpdateMachineRequest req) returns http:Ok|http:Unauthorized|http:NotFound|http:InternalServerError {
-        
-        // Valider le token
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
+    resource function put machines/[string machineId](@http:Header string appauth, UpdateMachineRequest req) returns http:Ok|http:Unauthorized|http:NotFound|http:InternalServerError {
+        JwtPayload|error payload = validateToken(appauth);
         
         if payload is error {
             return <http:Unauthorized>{
@@ -312,12 +301,9 @@ service /game on new http:Listener(server_port + 3) {
         };
     }
 
-    resource function delete machines/[string machineId](@http:Header string Authorization) returns http:Ok|http:Unauthorized|http:NotFound|http:InternalServerError {
-        
-        // Valider le token
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
-        
+    resource function delete machines/[string machineId](@http:Header string appauth) returns http:Ok|http:Unauthorized|http:NotFound|http:InternalServerError {
+        JwtPayload|error payload = validateToken(appauth);
+
         if payload is error {
             return <http:Unauthorized>{
                 body: {

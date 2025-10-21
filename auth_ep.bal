@@ -223,9 +223,8 @@ service /auth on new http:Listener(server_port +1) {
         };
     }
 
-    resource function get me(@http:Header string Authorization) returns UserPublic|http:Unauthorized|http:InternalServerError {
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
+    resource function get me(@http:Header string appauth) returns UserPublic|http:Unauthorized|http:InternalServerError {
+        JwtPayload|error payload = validateToken(appauth);
         if payload is error {
             return <http:Unauthorized>{
                 body: {

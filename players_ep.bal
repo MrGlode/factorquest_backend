@@ -2,10 +2,8 @@ import ballerina/http;
 import ballerina/log;
 
 service /players on new http:Listener(server_port +2) {
-    resource function get profile(@http:Header string Authorization) returns PlayerProfilePublic|http:Unauthorized|http:NotFound|http:InternalServerError {
-        string token = Authorization.substring(7);
-
-        JwtPayload|error payload = validateToken(token);
+    resource function get profile(@http:Header string appauth) returns PlayerProfilePublic|http:Unauthorized|http:NotFound|http:InternalServerError {
+        JwtPayload|error payload = validateToken(appauth);
         if payload is error {
             return <http:Unauthorized>{
                 body: {
@@ -27,10 +25,9 @@ service /players on new http:Listener(server_port +2) {
         return playerProfile;
     }
 
-    resource function put stats(@http:Header string Authorization, UpdatePlayerStatsRequest updates) returns http:Ok|http:Unauthorized|http:InternalServerError {
-        string token = Authorization.substring(7);
+    resource function put stats(@http:Header string appauth, UpdatePlayerStatsRequest updates) returns http:Ok|http:Unauthorized|http:InternalServerError {
 
-        JwtPayload|error payload = validateToken(token);
+        JwtPayload|error payload = validateToken(appauth);
         if payload is error {
             return <http:Unauthorized>{
                 body: {
@@ -56,10 +53,9 @@ service /players on new http:Listener(server_port +2) {
         };
     }
 
-    resource function post 'increment\-stat(@http:Header string Authorization, record {|string statName; int|decimal amount; |} req) returns http:Ok|http:BadRequest|http:Unauthorized|http:InternalServerError {
-        string token = Authorization.substring(7);
+    resource function post 'increment\-stat(@http:Header string appauth, record {|string statName; int|decimal amount; |} req) returns http:Ok|http:BadRequest|http:Unauthorized|http:InternalServerError {
 
-        JwtPayload|error payload = validateToken(token);
+        JwtPayload|error payload = validateToken(appauth);
         if payload is error {
             return <http:Unauthorized>{
                 body: {
@@ -106,10 +102,9 @@ service /players on new http:Listener(server_port +2) {
         };
     }
 
-    resource function put level(@http:Header string Authorization, record {|int level; int experience;|}req ) returns http:Ok|http:BadRequest|http:Unauthorized|http:InternalServerError {
-        string token = Authorization.substring(7);
+    resource function put level(@http:Header string appauth, record {|int level; int experience;|}req ) returns http:Ok|http:BadRequest|http:Unauthorized|http:InternalServerError {
 
-        JwtPayload|error payload = validateToken(token);
+        JwtPayload|error payload = validateToken(appauth);
         if payload is error {
             return <http:Unauthorized>{
                 body: {
@@ -179,9 +174,8 @@ service /players on new http:Listener(server_port +2) {
         return { totalPlayers: count };
     }
 
-    resource function delete profile(@http:Header string Authorization) returns http:Ok|http:BadRequest|http:Unauthorized|http:InternalServerError{
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
+    resource function delete profile(@http:Header string appauth) returns http:Ok|http:BadRequest|http:Unauthorized|http:InternalServerError{
+        JwtPayload|error payload = validateToken(appauth);
         if payload is error {
             return <http:Unauthorized>{
                 body: {

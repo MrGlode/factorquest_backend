@@ -2,11 +2,10 @@ import ballerina/http;
 import ballerina/log;
 
 service /research on new http:Listener(server_port + 5) {
-    resource function get laboratories(@http:Header string Authorization) returns LaboratoriesResponse|http:Unauthorized|http:InternalServerError {
-        
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
-        
+    resource function get laboratories(@http:Header string appauth) returns LaboratoriesResponse|http:Unauthorized|http:InternalServerError {
+
+        JwtPayload|error payload = validateToken(appauth);
+
         if payload is error {
             log:printError("Token invalide", 'error = payload);
             return <http:Unauthorized>{
@@ -32,11 +31,10 @@ service /research on new http:Listener(server_port + 5) {
         };
     }
 
-    resource function post laboratories(@http:Header string Authorization, PurchaseLaboratoryRequest req) returns PurchaseLaboratoryResponse|http:BadRequest|http:Unauthorized|http:InternalServerError {
-        
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
-        
+    resource function post laboratories(@http:Header string appauth, PurchaseLaboratoryRequest req) returns PurchaseLaboratoryResponse|http:BadRequest|http:Unauthorized|http:InternalServerError {
+
+        JwtPayload|error payload = validateToken(appauth);
+
         if payload is error {
             log:printError("Token invalide", 'error = payload);
             return <http:Unauthorized>{
@@ -123,11 +121,10 @@ service /research on new http:Listener(server_port + 5) {
         return research;
     }
 
-    resource function get active(@http:Header string Authorization) returns ActiveResearchesResponse|http:Unauthorized|http:InternalServerError {
-        
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
-        
+    resource function get active(@http:Header string appauth) returns ActiveResearchesResponse|http:Unauthorized|http:InternalServerError {
+
+        JwtPayload|error payload = validateToken(appauth);
+
         if payload is error {
             log:printError("Token invalide", 'error = payload);
             return <http:Unauthorized>{
@@ -153,11 +150,10 @@ service /research on new http:Listener(server_port + 5) {
         };
     }
 
-    resource function post 'start(@http:Header string Authorization, StartResearchRequest req) returns StartResearchResponse|http:BadRequest|http:Unauthorized|http:InternalServerError {
-        
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
-        
+    resource function post 'start(@http:Header string appauth, StartResearchRequest req) returns StartResearchResponse|http:BadRequest|http:Unauthorized|http:InternalServerError {
+
+        JwtPayload|error payload = validateToken(appauth);
+
         if payload is error {
             log:printError("Token invalide", 'error = payload);
             return <http:Unauthorized>{
@@ -198,11 +194,10 @@ service /research on new http:Listener(server_port + 5) {
         return result;
     }
 
-    resource function post complete/[string researchId](@http:Header string Authorization) returns http:Ok|http:BadRequest|http:Unauthorized|http:InternalServerError {
-        
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
-        
+    resource function post complete/[string researchId](@http:Header string appauth) returns http:Ok|http:BadRequest|http:Unauthorized|http:InternalServerError {
+
+        JwtPayload|error payload = validateToken(appauth);
+
         if payload is error {
             log:printError("Token invalide", 'error = payload);
             return <http:Unauthorized>{
@@ -230,11 +225,10 @@ service /research on new http:Listener(server_port + 5) {
         };
     }
 
-    resource function get completed(@http:Header string Authorization) returns CompletedResearchesResponse|http:Unauthorized|http:InternalServerError {
-        
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
-        
+    resource function get completed(@http:Header string appauth) returns CompletedResearchesResponse|http:Unauthorized|http:InternalServerError {
+
+        JwtPayload|error payload = validateToken(appauth);
+
         if payload is error {
             log:printError("Token invalide", 'error = payload);
             return <http:Unauthorized>{
@@ -260,11 +254,10 @@ service /research on new http:Listener(server_port + 5) {
         };
     }
 
-    resource function get effects(@http:Header string Authorization) returns ActiveEffectsResponse|http:Unauthorized|http:InternalServerError {
-        
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
-        
+    resource function get effects(@http:Header string appauth) returns ActiveEffectsResponse|http:Unauthorized|http:InternalServerError {
+
+        JwtPayload|error payload = validateToken(appauth);
+
         if payload is error {
             log:printError("Token invalide", 'error = payload);
             return <http:Unauthorized>{

@@ -2,11 +2,10 @@ import ballerina/http;
 import ballerina/log;
 
 service /market on new http:Listener(server_port + 4) {
-    resource function get prices(@http:Header string Authorization) returns MarketPricesResponse|http:Unauthorized|http:InternalServerError {
-        
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
-        
+    resource function get prices(@http:Header string appauth) returns MarketPricesResponse|http:Unauthorized|http:InternalServerError {
+
+        JwtPayload|error payload = validateToken(appauth);
+
         if payload is error {
             log:printError("Token invalide", 'error = payload);
             return <http:Unauthorized>{
@@ -32,11 +31,10 @@ service /market on new http:Listener(server_port + 4) {
         };
     }
 
-    resource function post sell(@http:Header string Authorization, SellResourceRequest req) returns SellResourceResponse|http:BadRequest|http:Unauthorized|http:InternalServerError {
-        
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
-        
+    resource function post sell(@http:Header string appauth, SellResourceRequest req) returns SellResourceResponse|http:BadRequest|http:Unauthorized|http:InternalServerError {
+
+        JwtPayload|error payload = validateToken(appauth);
+
         if payload is error {
             log:printError("Token invalide", 'error = payload);
             return <http:Unauthorized>{
@@ -80,11 +78,10 @@ service /market on new http:Listener(server_port + 4) {
         return result;
     }
 
-    resource function get orders(@http:Header string Authorization) returns SpecialOrderResponse|http:Unauthorized|http:InternalServerError {
-        
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
-        
+    resource function get orders(@http:Header string appauth) returns SpecialOrderResponse|http:Unauthorized|http:InternalServerError {
+
+        JwtPayload|error payload = validateToken(appauth);
+
         if payload is error {
             log:printError("Token invalide", 'error = payload);
             return <http:Unauthorized>{
@@ -110,11 +107,10 @@ service /market on new http:Listener(server_port + 4) {
         };
     }
 
-    resource function post orders/[string orderId]/fulfill(@http:Header string Authorization) returns FulfillOrderResponse|http:BadRequest|http:NotFound|http:Unauthorized|http:InternalServerError {
-        
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
-        
+    resource function post orders/[string orderId]/fulfill(@http:Header string appauth) returns FulfillOrderResponse|http:BadRequest|http:NotFound|http:Unauthorized|http:InternalServerError {
+
+        JwtPayload|error payload = validateToken(appauth);
+
         if payload is error {
             log:printError("Token invalide", 'error = payload);
             return <http:Unauthorized>{
@@ -175,11 +171,10 @@ service /market on new http:Listener(server_port + 4) {
         return result;
     }
 
-    resource function get transactions(@http:Header string Authorization, int 'limit = 50) returns TransactionsResponse|http:BadRequest|http:Unauthorized|http:InternalServerError {
-        
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
-        
+    resource function get transactions(@http:Header string appauth, int 'limit = 50) returns TransactionsResponse|http:BadRequest|http:Unauthorized|http:InternalServerError {
+
+        JwtPayload|error payload = validateToken(appauth);
+
         if payload is error {
             log:printError("Token invalide", 'error = payload);
             return <http:Unauthorized>{
@@ -215,11 +210,10 @@ service /market on new http:Listener(server_port + 4) {
         };
     }
 
-    resource function post orders/generate(@http:Header string Authorization) returns SpecialOrder|http:Unauthorized|http:InternalServerError {
-        
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
-        
+    resource function post orders/generate(@http:Header string appauth) returns SpecialOrder|http:Unauthorized|http:InternalServerError {
+
+        JwtPayload|error payload = validateToken(appauth);
+
         if payload is error {
             log:printError("Token invalide", 'error = payload);
             return <http:Unauthorized>{
@@ -243,11 +237,10 @@ service /market on new http:Listener(server_port + 4) {
         return 'order;
     }
 
-    resource function put prices/update(@http:Header string Authorization) returns http:Ok|http:Unauthorized|http:InternalServerError {
-        
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
-        
+    resource function put prices/update(@http:Header string appauth) returns http:Ok|http:Unauthorized|http:InternalServerError {
+
+        JwtPayload|error payload = validateToken(appauth);
+
         if payload is error {
             log:printError("Token invalide", 'error = payload);
             return <http:Unauthorized>{
@@ -275,11 +268,10 @@ service /market on new http:Listener(server_port + 4) {
         };
     }
 
-    resource function post initializePrices(@http:Header string Authorization) returns http:Ok|http:Unauthorized|http:InternalServerError {
-        
-        string token = Authorization.substring(7);
-        JwtPayload|error payload = validateToken(token);
-        
+    resource function post initializePrices(@http:Header string appauth) returns http:Ok|http:Unauthorized|http:InternalServerError {
+
+        JwtPayload|error payload = validateToken(appauth);
+
         if payload is error {
             log:printError("Token invalide", 'error = payload);
             return <http:Unauthorized>{
