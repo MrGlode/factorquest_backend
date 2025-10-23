@@ -123,6 +123,7 @@ public function findInventoryByUserId(string userId) returns Inventory|error {
 }
 
 public function updateInventory(string userId, InventoryItem[] items) returns error? {
+    log:printInfo(items.toJsonString());
     mongodb:Collection inventories = check getCollection(INVENTORIES);
 
     map<json> filter = {
@@ -178,7 +179,7 @@ public function createMachine(CreateMachineRequest createRequest, string userId)
         name: dbMachine.name,
         cost: costMachine,
         selectedRecipeId: (),
-        lastProductionTime: now,
+        lastProductionTime: now[0],
         pauseProgress: 0.0d,
         isActive: false,
         createdAt: now
@@ -270,7 +271,7 @@ public function findMachineById(string machineId, string userId) returns Machine
     return result;
 }
 
-public function updateMachine(string machineId, string userId, UpdateMachineRequest updateRequest) returns error? {
+public function updateMachine(string machineId, string userId, UpdateMachineRequest updateRequest) returns Machine|error? {
     mongodb:Collection machines = check getCollection(MACHINES);
 
     map<json> filter = {
@@ -289,7 +290,7 @@ public function updateMachine(string machineId, string userId, UpdateMachineRequ
     if updateRequest.pauseProgress is decimal {
         updateFields["pauseProgress"] = updateRequest.pauseProgress;
     }
-    if updateRequest.lastProductionTime is time:Utc {
+    if updateRequest.lastProductionTime is int {
         updateFields["lastProductionTime"] = updateRequest.lastProductionTime;
     }
 
@@ -318,6 +319,7 @@ public function updateMachine(string machineId, string userId, UpdateMachineRequ
     }
 
     log:printInfo("Updated machine " + machineId + " for user: " + userId);
+    return findMachineById(machineId, userId);
 }
 
 public function deleteMachine(string machineId, string userId) returns error? {

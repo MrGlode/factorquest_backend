@@ -169,7 +169,7 @@ public type Machine record {|
     string name;
     decimal cost;
     string? selectedRecipeId;
-    time:Utc lastProductionTime;
+    int lastProductionTime;
     decimal pauseProgress;
     boolean isActive;
     time:Utc createdAt;
@@ -195,7 +195,7 @@ public type CreateMachineRequest record {|
 |};
 
 public type UpdateMachineRequest record {|
-    time:Utc? lastProductionTime;
+    int? lastProductionTime;
     string? selectedRecipeId;
     decimal? pauseProgress;
     boolean? isActive;

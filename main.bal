@@ -34,6 +34,7 @@ service on new http:Listener(server_port) {
 
 public function main() returns error? {
     log:printInfo("FactoQuest Backend service started on port " + server_port.toString());
+    log:printInfo("time example: " + time:utcNow().toString());
     check initializeDefaultRecipes();
     check initializeDefaultResources();
     check initializeDefaultMachines();

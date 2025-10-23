@@ -228,7 +228,7 @@ public function initializeDefaultMachines() returns error? {
             name: "Mine",
             cost: 100.0d,
             selectedRecipeId: "",
-            lastProductionTime: time:utcNow(),
+            lastProductionTime: time:utcNow()[0],
             pauseProgress: 0.0d,
             isActive: false,
             createdAt: time:utcNow() 
@@ -240,7 +240,7 @@ public function initializeDefaultMachines() returns error? {
             name: "Furnace",
             cost: 200.0d,
             selectedRecipeId: "",
-            lastProductionTime: time:utcNow(),
+            lastProductionTime: time:utcNow()[0],
             pauseProgress: 0.0d,
             isActive: false,
             createdAt: time:utcNow() 
@@ -252,7 +252,7 @@ public function initializeDefaultMachines() returns error? {
             name: "Assembler",
             cost: 500.0d,
             selectedRecipeId: "",
-            lastProductionTime: time:utcNow(),
+            lastProductionTime: time:utcNow()[0],
             pauseProgress: 0.0d,
             isActive: false,
             createdAt: time:utcNow() 

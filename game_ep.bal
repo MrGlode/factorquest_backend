@@ -262,7 +262,7 @@ service /game on new http:Listener(server_port + 3) {
         return machine;
     }
 
-    resource function put machines/[string machineId](@http:Header string appauth, UpdateMachineRequest req) returns http:Ok|http:Unauthorized|http:NotFound|http:InternalServerError {
+    resource function put machines/[string machineId](@http:Header string appauth, UpdateMachineRequest req) returns http:InternalServerError|Machine?|http:Unauthorized|http:NotFound {
         JwtPayload|error payload = validateToken(appauth);
         
         if payload is error {
@@ -274,7 +274,7 @@ service /game on new http:Listener(server_port + 3) {
         }
         
         // Mettre à jour la machine
-        error? updateResult = updateMachine(machineId, payload.sub, req);
+        Machine|error? updateResult = updateMachine(machineId, payload.sub, req);
         
         if updateResult is error {
             log:printError("Error updating machine", updateResult);
@@ -294,11 +294,7 @@ service /game on new http:Listener(server_port + 3) {
             };
         }
         
-        return <http:Ok>{
-            body: {
-                message: "Machine mise à jour"
-            }
-        };
+        return updateResult;
     }
 
     resource function delete machines/[string machineId](@http:Header string appauth) returns http:Ok|http:Unauthorized|http:NotFound|http:InternalServerError {
